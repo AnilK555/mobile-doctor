@@ -1,40 +1,34 @@
 import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/db";
+import { Accessory } from "@/lib/models";
+import { verifyAuthHeader } from "@/lib/auth";
 
-const BACKEND_URL = "http://localhost:5001/api/accessories";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET(req, { params }) {
+  await connectToDatabase();
   const { id } = params;
-  const token = req.headers.get("authorization");
-  const res = await fetch(`${BACKEND_URL}/${id}`, {
-    headers: { Authorization: token },
-  });
-  const data = await res.json();
-  return NextResponse.json(data, { status: res.status });
+  const doc = await Accessory.findById(id);
+  if (!doc) return NextResponse.json({ error: "Accessory not found" }, { status: 404 });
+  return NextResponse.json(doc);
 }
 
 export async function PUT(req, { params }) {
+  await connectToDatabase();
+  const auth = verifyAuthHeader(req);
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = params;
   const body = await req.json();
-  const token = req.headers.get("authorization");
-  const res = await fetch(`${BACKEND_URL}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token,
-    },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  return NextResponse.json(data, { status: res.status });
+  const doc = await Accessory.findByIdAndUpdate(id, body, { new: true });
+  return NextResponse.json(doc);
 }
 
 export async function DELETE(req, { params }) {
+  await connectToDatabase();
+  const auth = verifyAuthHeader(req);
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = params;
-  const token = req.headers.get("authorization");
-  const res = await fetch(`${BACKEND_URL}/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: token },
-  });
-  const data = await res.json();
-  return NextResponse.json(data, { status: res.status });
+  await Accessory.findByIdAndDelete(id);
+  return NextResponse.json({ message: "Accessory deleted" });
 }

@@ -17,7 +17,7 @@ export default function DashboardPage() {
     async function fetchAccessories() {
       setLoading(true);
       const token = localStorage.getItem("token");
-      let url = `${process.env.NEXT_PUBLIC_API_URL}/api/accessories`;
+  let url = `/api/accessories`;
 
       const params = [];
       if (brand) params.push(`brand=${brand}`);

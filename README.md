@@ -1,24 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a [Next.js](https://nextjs.org) app with built-in API routes (no separate server needed).
 
-## Getting Started
+## Getting Started (Local)
 
-First, run the development server:
+1. Copy env template and fill values:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Required vars:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- MONGO_URI
+- JWT_SECRET
+- CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install deps and run:
+
+```bash
+npm install
+npm run dev
+```
+
+Open http://localhost:3000
 
 ## Learn More
 
@@ -31,6 +34,37 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This repo is ready for single-click deploy to Vercel:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Import the Git repository into Vercel
+2. In Project Settings → Environment Variables, add:
+   - MONGO_URI
+   - JWT_SECRET
+   - CLOUDINARY_CLOUD_NAME
+   - CLOUDINARY_API_KEY
+   - CLOUDINARY_API_SECRET
+3. Deploy
+
+No separate Node server is required—API routes live under `src/app/api/**`.
+
+## API Notes
+
+- Auth:
+  - POST `/api/auth/register` { username, password }
+  - POST `/api/auth/login` { username, password } → { token }
+  - Use `Authorization: Bearer <token>` for protected routes
+- Accessories:
+  - GET `/api/accessories?brand=...&type=...&color=...`
+  - GET `/api/accessories?brandsList=1` → distinct brands
+  - GET `/api/accessories?colorsList=1` → distinct colors
+  - GET `/api/accessories?typesList=1` → distinct types
+  - GET `/api/accessories/:id`
+  - POST `/api/accessories` (auth required)
+  - PUT `/api/accessories/:id` (auth required)
+  - DELETE `/api/accessories/:id` (auth required)
+
+Images: POST supports a base64 data URL; images over 1MB are rejected and Cloudinary is used to store them.
+
+## Legacy `/server` folder
+
+The `server/` directory (Express app) is no longer used. You can safely delete it. All functionality has been ported to Next.js route handlers.
