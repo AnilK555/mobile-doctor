@@ -14,7 +14,7 @@ app.use((req, res, next) => {
 app.use(cors());
 app.use(express.json());
 
-const MONGO_URI = 'mongodb+srv://anilk:Anilmongo555@mobile-doctor.fryj5mw.mongodb.net/?retryWrites=true&w=majority&appName=mobile-doctor';
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
